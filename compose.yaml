@@ -3,7 +3,7 @@ services:
     image: 'mysql'
     container_name: 'mysql_db'
     environment:
-      - 'MYSQL_ROOT_PASSWORD=admin'
+      MYSQL_ROOT_PASSWORD: 'admin'
     ports:
       - '3306:3306'
     networks:
@@ -13,8 +13,8 @@ services:
     container_name: rabbitmq
     restart: always
     environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      RABBITMQ_DEFAULT_PASS: 'secret'
+      RABBITMQ_DEFAULT_USER: 'myuser'
     ports:
       - '5672:5672'
       - '15672:15672'
@@ -43,6 +43,29 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
       - SERVER_PORT=8081
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=myuser
+      - RABBITMQ_PASSWORD=secret
+      - EUREKA_SERVER=http://ms-eureka:8761/eureka
+    depends_on:
+      - database
+      - rabbitmq
+      - ms-eureka-server
+    networks:
+      - devsu-network
+  ms-cuenta-movimiento:
+    build:
+      context: ./ms-cuenta-movimiento
+      dockerfile: Dockerfile
+    container_name: ms-cuenta
+    ports:
+      - "8082:8082" # Mapeo de puerto externo
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/cuenta_movimiento_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SERVER_PORT=8082
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_USERNAME=myuser
