@@ -9,6 +9,7 @@ import com.devsu.ing.deiberv.ms.cliente.fixture.ClienteFixture;
 import com.devsu.ing.deiberv.ms.cliente.mapper.ClienteMapper;
 import com.devsu.ing.deiberv.ms.cliente.repository.ClienteRepository;
 import com.devsu.ing.deiberv.ms.cliente.service.publisher.ClienteEventProducer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,9 +44,16 @@ public class ClienteServiceImplTest {
   @InjectMocks
   private ClienteServiceImpl clienteService;
 
+  private AutoCloseable closeable;
+
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.openMocks(this);
+    closeable = MockitoAnnotations.openMocks(this);
+  }
+
+  @AfterEach
+  public void tearDown() throws Exception {
+    if (closeable != null) closeable.close();
   }
 
   @Test
@@ -150,6 +158,20 @@ public class ClienteServiceImplTest {
     Cliente saved = captor.getValue();
     assertEquals(EstadoClienteEnum.FALSE, saved.getEstado());
     verify(clienteEventProducer, times(1)).publicarEvento(any());
+  }
+
+  @Test
+  public void crearCliente_debeFallarIdentificacionExistente() {
+    ClienteRequest request = ClienteFixture.obtenerClienteRequest();
+
+    // Simular que ya existe un cliente con la misma identificacion
+    when(clienteRepository.existsByIdentificacion(request.getIdentificacion())).thenReturn(true);
+
+    assertThrows(SimpleException.class, () -> clienteService.crearCliente(request));
+
+    // Verificar que no se intentó guardar ni publicar evento
+    verify(clienteRepository, times(0)).save(any(Cliente.class));
+    verify(clienteEventProducer, times(0)).publicarEvento(any());
   }
 
 }

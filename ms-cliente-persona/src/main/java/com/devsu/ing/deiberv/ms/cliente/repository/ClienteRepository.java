@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
+
+  // Método para verificar existencia por identificacion usado en la validación del servicio
+  boolean existsByIdentificacion(String identificacion);
+
 }

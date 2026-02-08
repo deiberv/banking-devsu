@@ -156,12 +156,6 @@
     {
       "key": "URL",
       "value": "http://localhost:8081",
-      "type": "string",
-      "disabled": true
-    },
-    {
-      "key": "URL",
-      "value": "http://localhost:9090/ms-clientes",
       "type": "string"
     }
   ]

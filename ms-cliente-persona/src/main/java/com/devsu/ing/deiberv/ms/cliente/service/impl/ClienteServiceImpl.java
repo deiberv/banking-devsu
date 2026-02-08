@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class ClienteServiceImpl implements ClienteService {
   private final ClienteRepository clienteRepository;
   private final ClienteMapper mapper;
   private final ClienteEventProducer clienteEventProducer;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public List<ClienteDto> listarClientes() {
@@ -49,7 +51,13 @@ public class ClienteServiceImpl implements ClienteService {
   @Transactional
   public ClienteDto crearCliente(ClienteRequest clienteRequest) {
     log.debug("Creando cliente {}", clienteRequest);
+    this.assertIdentificadorUnico(clienteRequest.getIdentificacion());
     var cliente = this.mapper.toCliente(clienteRequest);
+    // Encriptar password si viene en el request
+    if (cliente.getPassword() != null) {
+      cliente.setPassword(this.passwordEncoder.encode(cliente.getPassword()));
+    }
+
     this.clienteRepository.save(cliente);
     this.clienteEventProducer.publicarEvento(new ClienteCreadoEvent(cliente.getClienteId(), cliente.getNombre()));
     return this.convertToClienteDto(cliente);
@@ -65,7 +73,12 @@ public class ClienteServiceImpl implements ClienteService {
     cliente.setIdentificacion(Objects.requireNonNullElse(clienteRequest.getIdentificacion(), cliente.getIdentificacion()));
     cliente.setDireccion(Objects.requireNonNullElse(clienteRequest.getDireccion(), cliente.getDireccion()));
     cliente.setTelefono(Objects.requireNonNullElse(clienteRequest.getTelefono(), cliente.getTelefono()));
-    cliente.setPassword(Objects.requireNonNullElse(clienteRequest.getPassword(), cliente.getPassword()));
+
+    // Si llega nueva contraseña, encriptarla
+    if (clienteRequest.getPassword() != null) {
+      cliente.setPassword(this.passwordEncoder.encode(clienteRequest.getPassword()));
+    }
+
     this.clienteRepository.save(cliente);
     this.clienteEventProducer.publicarEvento(new ClienteCreadoEvent(cliente.getClienteId(), cliente.getNombre()));
     return this.convertToClienteDto(cliente);
@@ -91,6 +104,12 @@ public class ClienteServiceImpl implements ClienteService {
 
   private ClienteDto convertToClienteDto(Cliente cliente) {
     return this.mapper.toClienteDto(cliente);
+  }
+
+  private void assertIdentificadorUnico(String identificacion) {
+    if (this.clienteRepository.existsByIdentificacion(identificacion)) {
+      throw new SimpleException(EnumError.CLIENTE_IDENTIFICACION_UNIQUE, HttpStatus.BAD_REQUEST.value());
+    }
   }
 
 }

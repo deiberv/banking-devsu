@@ -192,12 +192,6 @@
     {
       "key": "URL",
       "value": "http://localhost:8082",
-      "type": "string",
-      "disabled": true
-    },
-    {
-      "key": "URL",
-      "value": "http://localhost:9090/ms-cuenta-movimiento",
       "type": "string"
     }
   ]

@@ -14,7 +14,8 @@ public enum EnumError {
   INVALID_BODY("ERROR_CO_004", "Cuerpo de llamada invalido"),
   NO_CONTENT("ERROR_CO_005", "No se encontraron resultados"),
   /*Errores de dominio - Cliente*/
-  CLIENTE_NOT_FOUND("ERROR_CL_001", "Cliente no existe"),;
+  CLIENTE_NOT_FOUND("ERROR_CL_001", "Cliente no existe"),
+  CLIENTE_IDENTIFICACION_UNIQUE("ERROR_CL_002", "Ya existe un cliente con la identificacion indicada"),;
 
   private String code;
   private String message;
