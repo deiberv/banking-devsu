@@ -41,22 +41,22 @@ spring:
           enabled: true
           initial-interval: 3s
           max-attempts: 3
-  ## Eureka client configuration
-  eureka:
-    client:
-      service-url:
-        defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
-    instance:
-      prefer-ip-address: true
-      instance-id: ${spring.application.name}:${random.value}
+## Eureka client configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
 
-  ## Swagger configuration
-  swagger:
-    base:
-      package: com.devsu.ing.deiberv.ms.cuenta
-    project:
-      name: ${spring.application.name}
-      description: Api MS Cuenta Movimiento
-      version: 1.0
-      contactName: Deiber Velandria
-      contactEmail: deiberv@gmail.com
+## Swagger configuration
+swagger:
+  base:
+    package: com.devsu.ing.deiberv.ms.cuenta
+  project:
+    name: ${spring.application.name}
+    description: Api MS Cuenta Movimiento
+    version: 1.0
+    contactName: Deiber Velandria
+    contactEmail: deiberv@gmail.com

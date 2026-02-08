@@ -1,13 +1,16 @@
 services:
-  database:
-    image: 'mysql'
-    container_name: 'mysql_db'
+  devsu_mysql_db:
+    image: 'mysql:8.4.8'
+    container_name: 'devsu_mysql_db'
     environment:
       MYSQL_ROOT_PASSWORD: 'admin'
     ports:
       - '3306:3306'
     networks:
       - devsu-network
+    volumes:
+      #- ./devsu-data/mysql:/var/lib/mysql
+      - ./base-datos/BaseDeDatos.sql:/docker-entrypoint-initdb.d/init.sql
   rabbitmq:
     image: 'rabbitmq:4.2.3-management'
     container_name: rabbitmq
@@ -18,13 +21,16 @@ services:
     ports:
       - '5672:5672'
       - '15672:15672'
+    volumes:
+      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     networks:
       - devsu-network
   ms-eureka-server:
     build:
       context: ./ms-eureka-server
       dockerfile: Dockerfile
-    container_name: ms-eureka
+    container_name: ms-eureka-server
     ports:
       - "8761:8761" # Mapeo de puerto externo
     environment:
@@ -35,34 +41,37 @@ services:
     build:
       context: ./ms-cliente-persona
       dockerfile: Dockerfile
-    container_name: ms-cliente
+    container_name: ms-cliente-persona
     ports:
       - "8081:8081" # Mapeo de puerto externo
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/cliente_db
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=admin
-      - SERVER_PORT=8081
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USERNAME=myuser
-      - RABBITMQ_PASSWORD=secret
-      - EUREKA_SERVER=http://ms-eureka:8761/eureka
+      SPRING_DATASOURCE_URL: jdbc:mysql://devsu_mysql_db:3306/cliente_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+      SERVER_PORT: 8081
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: myuser
+      RABBITMQ_PASSWORD: secret
+      EUREKA_SERVER: http://ms-eureka-server:8761/eureka
     depends_on:
-      - database
+      - devsu_mysql_db
       - rabbitmq
       - ms-eureka-server
     networks:
       - devsu-network
+    links:
+      - rabbitmq
+      - devsu_mysql_db
   ms-cuenta-movimiento:
     build:
       context: ./ms-cuenta-movimiento
       dockerfile: Dockerfile
-    container_name: ms-cuenta
+    container_name: ms-cuenta-movimiento
     ports:
       - "8082:8082" # Mapeo de puerto externo
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/cuenta_movimiento_db
+      - SPRING_DATASOURCE_URL=jdbc:mysql://devsu_mysql_db:3306/cuenta_movimiento_db
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=admin
       - SERVER_PORT=8082
@@ -70,13 +79,16 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USERNAME=myuser
       - RABBITMQ_PASSWORD=secret
-      - EUREKA_SERVER=http://ms-eureka:8761/eureka
+      - EUREKA_SERVER=http://ms-eureka-server:8761/eureka
     depends_on:
-      - database
+      - devsu_mysql_db
       - rabbitmq
       - ms-eureka-server
     networks:
       - devsu-network
+    links:
+      - rabbitmq
+      - devsu_mysql_db
 
 networks:
   devsu-network:
