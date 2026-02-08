@@ -29,17 +29,17 @@ spring.rabbitmq.port=${RABBITMQ_PORT:5672}
 spring.rabbitmq.username=${RABBITMQ_USER:guest}
 spring.rabbitmq.password=${RABBITMQ_PASSWORD:guest}
 
-rabbitmq.queue.name=devsu.clientes.queue
-rabbitmq.queue.exchange=devsu.clientes.exchange
-rabbitmq.queue.routing.key=devsu.clientes.routingKey
+rabbitmq.queue-name=cliente_queue
+rabbitmq.exchange-name=cliente_exchange
+rabbitmq.routing-key=cliente_routing_key
 ```
 - **RABBITMQ_HOST:** Servidor donde se esta ejecutando rabbitMQ
 - **RABBITMQ_PORT:** Pruerto de comunicacion
 - **RABBITMQ_USER:** Usuario con acceso al servidor RabbitMQ
 - **RABBITMQ_PASSWORD:** Clave de acceso del usuario servidor RabbitMQ
-- **rabbitmq.queue.name** -> Indica el nombre de la cola donde se publicaran los mensajes
-- **rabbitmq.exchange.name** -> Indica el nombre del exchange donde se publicaran los mensajes
-- **rabbitmq.queue.routing.key** -> Identificador de la ruta
+- **rabbitmq.queue-name** -> Indica el nombre de la cola donde se publicaran los mensajes
+- **rabbitmq.exchange-name** -> Indica el nombre del exchange donde se publicaran los mensajes
+- **rabbitmq.routing-key** -> Identificador de la ruta
 
 ## Documentacion
 Para ingresar a la documentacion del api desarrollada se debe ingresar a [click](http://localhost:8081/swagger-ui/index.html)
