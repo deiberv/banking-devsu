@@ -1,0 +1,60 @@
+services:
+  database:
+    image: 'mysql'
+    container_name: 'mysql_db'
+    environment:
+      - 'MYSQL_ROOT_PASSWORD=admin'
+    ports:
+      - '3306:3306'
+    networks:
+      - devsu-network
+  rabbitmq:
+    image: 'rabbitmq:4.2.3-management'
+    container_name: rabbitmq
+    restart: always
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      - devsu-network
+  ms-eureka-server:
+    build:
+      context: ./ms-eureka-server
+      dockerfile: Dockerfile
+    container_name: ms-eureka
+    ports:
+      - "8761:8761" # Mapeo de puerto externo
+    environment:
+      - SERVER_PORT=8761
+    networks:
+      - devsu-network
+  ms-cliente-persona:
+    build:
+      context: ./ms-cliente-persona
+      dockerfile: Dockerfile
+    container_name: ms-cliente
+    ports:
+      - "8081:8081" # Mapeo de puerto externo
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/cliente_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SERVER_PORT=8081
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=myuser
+      - RABBITMQ_PASSWORD=secret
+      - EUREKA_SERVER=http://ms-eureka:8761/eureka
+    depends_on:
+      - database
+      - rabbitmq
+      - ms-eureka-server
+    networks:
+      - devsu-network
+
+networks:
+  devsu-network:
+        driver: bridge

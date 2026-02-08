@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ms-eureka-server
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    wait-time-in-ms-when-sync-empty: 0
+    eviction-interval-timer-in-ms: 5000
+    instance-info-replication-interval-seconds: 5
+    peer-eureka-nodes-update-interval-seconds: 5
+    peer-eureka-nodes-refresh-interval-seconds: 5
