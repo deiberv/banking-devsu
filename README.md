@@ -34,3 +34,15 @@ Para levantar las ejecucion de los contenedores mediante docker compose, se debe
 ```shell
 docker compose up -d
 ```
+
+### Consideraciones
+El microservicio ms-cuenta-movimiento podría fallar al iniciar, esto debido a que requiere la existencia de la cola en rabbitmq llamada **cliente_queue** para su correcto funcionamiento, para solucionar esto se debe iniciar el microservicio ms-cliente-persona primero, esto se puede hacer ejecutando el siguiente comando.
+
+Si no se ejecuta de manera correcta, es necesario ingresar al url [http://localhost:15672/](http://localhost:15672/) para crear la cola **cliente_queue** de manera manual, 
+ - Ingresar en la pestaña de Exchanges y luego hacer click en el boton "Add a new exchange"
+ - En el campo "Name" ingresar el nombre del exchange **cliente_exchange** el tipo o type debe ser Direct y luego hacer en add exchange. 
+ - Ingresar en la pestaña de "Queues" y luego hacer click en el boton "Add a new queue"
+ - En el campo "Name" ingresar el nombre de la cola **cliente_queue** y luego hacer click en el boton "Add Queue" para crear la cola, una vez creada la cola,
+ - Volvemos al exchange "cliente_exchange" y hacemos click en el boton "Add binding" para agregar una nueva vinculacion, en el campo "To queue" ingresar el nombre de la cola **cliente_queue**, colocar en Routing key el valor **cliente_routing_key** y luego hacer click en el boton "Bind" para vincular el exchange con la cola, esto es necesario para que el microservicio ms-cuenta-movimiento pueda consumir los mensajes enviados por el microservicio ms-cliente-persona,
+
+luego se debe reiniciar el contenedor del microservicio ms-cuenta-movimiento para que pueda iniciar de manera correcta.
