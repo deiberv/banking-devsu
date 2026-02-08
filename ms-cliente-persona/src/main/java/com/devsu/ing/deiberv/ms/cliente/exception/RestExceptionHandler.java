@@ -36,7 +36,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler({SimpleException.class})
   public ResponseEntity<Object> handleSimpleException(final SimpleException ex, final WebRequest webRequest) {
-    log.warn("Hubo una excepcion controlada. Estado. {}, Codigo: {}, Mensaje: {} ", ex.getStatus(), ex.getCode(), ex.getMessage(), ex);
+    log.warn("Hubo una excepcion controlada. Estado. {}, Codigo: {}, Mensaje: {} ", ex.getStatus(), ex.getCode(), ex.getMessage());
     return this.doHandleSimpleException(ex, webRequest);
   }
 

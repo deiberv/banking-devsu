@@ -65,7 +65,7 @@ public class MovimientosServiceImpl implements MovimientosService {
     }
 
     var fechaStart = fechaInicial.atStartOfDay();
-    var fechaEnd = fechaInicial.atTime(23,59,59);
+    var fechaEnd = fechaConsultaFin.atTime(23,59,59);
     var movimientos = this.movimientosRepository.findAllByClienteAndFecha(clienteId, fechaStart, fechaEnd, Sort.by("fecha").descending());
     return movimientos.stream().map(movimiento -> MovimientoRpt.builder()
       .fecha(movimiento.getFecha().toLocalDate())
