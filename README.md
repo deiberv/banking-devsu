@@ -35,6 +35,13 @@ Para levantar las ejecucion de los contenedores mediante docker compose, se debe
 docker compose up -d
 ```
 
+Se puede presentar escenarios en que los servicios ms-cliente-persona y ms-cuenta-movimiento no se inicien de manera correcta, esto puede ser por varios motivos, uno de ellos es que el servicio de mysql no este listo para aceptar conexiones, en este caso se recomienda detener poner en marcha dichos contenedores ocn los comandos siguientes.
+
+```shell
+docker compose up -d --no-deps --build ms-cliente-persona
+docker compose up -d --no-deps --build ms-cuenta-movimiento
+```
+
 ### Consideraciones
 El microservicio ms-cuenta-movimiento podría fallar al iniciar, esto debido a que requiere la existencia de la cola en rabbitmq llamada **cliente_queue** para su correcto funcionamiento, para solucionar esto se debe iniciar el microservicio ms-cliente-persona primero, esto se puede hacer ejecutando el siguiente comando.
 

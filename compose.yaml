@@ -11,6 +11,11 @@ services:
     volumes:
       #- ./devsu-data/mysql:/var/lib/mysql
       - ./base-datos/BaseDeDatos.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   rabbitmq:
     image: 'rabbitmq:4.2.3-management'
     container_name: rabbitmq
@@ -55,9 +60,12 @@ services:
       RABBITMQ_PASSWORD: secret
       EUREKA_SERVER: http://ms-eureka-server:8761/eureka
     depends_on:
-      - devsu_mysql_db
-      - rabbitmq
-      - ms-eureka-server
+      rabbitmq:
+        condition: service_started
+      ms-eureka-server:
+        condition: service_started
+      devsu_mysql_db:
+        condition: service_started
     networks:
       - devsu-network
     links:
@@ -81,9 +89,12 @@ services:
       - RABBITMQ_PASSWORD=secret
       - EUREKA_SERVER=http://ms-eureka-server:8761/eureka
     depends_on:
-      - devsu_mysql_db
-      - rabbitmq
-      - ms-eureka-server
+      rabbitmq:
+        condition: service_started
+      ms-eureka-server:
+        condition: service_started
+      devsu_mysql_db:
+        condition: service_started
     networks:
       - devsu-network
     links:
